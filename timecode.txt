@@ -1,0 +1,43 @@
+from youtube_transcript_api import YouTubeTranscriptApi
+from openai import OpenAI
+import os
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+import os
+
+# Load your OpenAI API key from an environment variable
+
+# Define the URL and extract video ID
+url = 'https://youtu.be/aX-uJgI3Pl8'
+print(f"Video URL: {url}")
+
+video_id = url.replace('https://www.youtube.com/watch?v=', '')
+print(f"Video ID: {video_id}")
+
+# Fetch the transcript
+try:
+    transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    print("Transcript fetched successfully.")
+except Exception as e:
+    print(f"Error fetching transcript: {e}")
+    transcript = []
+
+# Prepare the prompt for GPT-4
+prompt = (
+    f"You are a database computer. Here is a transcript in JSON format:\n"
+    f"{transcript}\n\n"
+    "What are the topics discussed in this video? Provide start time codes in seconds and also in minutes and seconds."
+)
+
+# Query GPT-4
+try:
+    response = client.chat.completions.create(model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "You are a database computer."},
+        {"role": "user", "content": prompt}
+    ])
+    timecode = response.choices[0].message.content
+    print("Timecode result:")
+    print(timecode)
+except Exception as e:
+    print(f"Error during GPT-4 API request: {e}")

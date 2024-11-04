@@ -1,0 +1,19 @@
+
+
+# Load your OpenAI API key from an environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+try:
+    models = openai.Model.list()
+    print("Available models:")
+    for model in models["data"]:
+        print(model["id"])
+except Exception as e:
+    print(f"Error fetching models: {e}")
+
+
+
+    # messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
